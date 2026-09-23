@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Шпаргалка Git — voidweb</title>
+    <style>
+        :root {
+            --bg: #f4f1ea;
+            --ink: #1c1915;
+            --muted: #5c564c;
+            --line: #ddd4c4;
+            --card: #fffdf8;
+            --disk: #8a5a2b;
+            --stage: #9a6b12;
+            --local: #1f6b4a;
+            --remote: #1d4e89;
+            --no: #8f3d32;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font: 17px/1.5 Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+        main { max-width: 920px; margin: 0 auto; padding: 32px 20px 64px; }
+        h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 8px; }
+        h2 { font-size: 1.35rem; margin: 36px 0 12px; }
+        p { margin: 0 0 12px; }
+        .lead { color: var(--muted); max-width: 42rem; }
+        code, .cmd {
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.92em;
+        }
+        .flow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0 8px;
+        }
+        .place {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-top: 6px solid var(--disk);
+            padding: 12px;
+        }
+        .place strong { display: block; }
+        .place span { color: var(--muted); font-size: 0.92rem; }
+        .place.stage { border-top-color: var(--stage); }
+        .place.local { border-top-color: var(--local); }
+        .place.remote { border-top-color: var(--remote); }
+        .arrow-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            color: var(--muted);
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 0.82rem;
+            margin-bottom: 8px;
+        }
+        .arrow-row div { padding-left: 4px; }
+        ol.steps { list-style: none; padding: 0; margin: 0; }
+        li.step {
+            background: var(--card);
+            border: 1px solid var(--line);
+            margin: 0 0 14px;
+            padding: 16px 16px 12px;
+        }
+        .step-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+        .n {
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            color: var(--muted);
+        }
+        pre {
+            margin: 0 0 12px;
+            padding: 10px 12px;
+            background: #241f1a;
+            color: #f6f1e7;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.98rem; }
+        th, td { text-align: left; vertical-align: top; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--line); }
+        th { color: var(--muted); font-weight: normal; width: 28%; }
+        .flag { color: #9a6b12; }
+        .yes { color: var(--local); }
+        .off { color: var(--no); }
+        .note {
+            background: #fff;
+            border-left: 4px solid var(--stage);
+            padding: 10px 12px;
+            margin: 12px 0;
+        }
+        @media (max-width: 720px) {
+            .flow, .arrow-row { grid-template-columns: 1fr 1fr; }
+            .step-head { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Шпаргалка Git</h1>
+    <p class="lead">Порядок, которым <code>index.php</code> попадает с диска на GitHub. На каждом шаге одна команда. Пока команду не выполнил, состояние файла не меняется.</p>
+
+    <h2>Где живёт файл</h2>
+    <div class="flow">
+        <div class="place"><strong>1. Диск</strong><span>папка voidweb на Mac</span></div>
+        <div class="place stage"><strong>2. Индекс</strong><span>черновик следующего коммита</span></div>
+        <div class="place local"><strong>3. Локальный git</strong><span>история в папке .git</span></div>
+        <div class="place remote"><strong>4. GitHub</strong><span>github.com/itwawox/voidweb</span></div>
+    </div>
+    <div class="arrow-row">
+        <div>файл создан</div>
+        <div>git add →</div>
+        <div>git commit →</div>
+        <div>git push →</div>
+    </div>
+    <p>Коммит — это снимок файлов плюс сообщение, зачем он сделан. GitHub видит только то, что ушло через <code>git push</code>.</p>
+
+    <h2>Порядок команд для index.php</h2>
+    <ol class="steps">
+        <li class="step">
+            <div class="step-head"><strong>Посмотреть, видит ли git файл</strong><span class="n">шаг 0</span></div>
+            <pre><code>git status</code></pre>
+            <table>
+                <tr><th>Ключи</th><td>нет</td></tr>
+                <tr><th>Что делает</th><td>Ничего не записывает. Показывает, какие файлы новые, изменённые или уже в индексе.</td></tr>
+                <tr><th>Диск</th><td><code>index.php</code> лежит в папке.</td></tr>
+                <tr><th>Индекс</th><td class="off">пусто</td></tr>
+                <tr><th>Локальный git</th><td class="off">коммитов нет. Ветка <code>main</code> пустая.</td></tr>
+                <tr><th>GitHub</th><td class="off">репозиторий пустой, файла нет.</td></tr>
+                <tr><th>Как выглядит</th><td><code>Untracked files: index.php</code> — git файл видит и ещё не хранит.</td></tr>
+            </table>
+        </li>
+
+        <li class="step">
+            <div class="step-head"><strong>Положить файл в черновик коммита</strong><span class="n">шаг 1</span></div>
+            <pre><code>git add index.php</code></pre>
+            <table>
+                <tr><th>Ключи</th><td>нет. <code>index.php</code> — это имя файла, не ключ.</td></tr>
+                <tr><th>Что делает</th><td>Копирует текущее содержимое файла в индекс. На GitHub ничего не уходит.</td></tr>
+                <tr><th>Диск</th><td>файл на месте, содержимое то же.</td></tr>
+                <tr><th>Индекс</th><td class="yes"><code>index.php</code> подготовлен.</td></tr>
+                <tr><th>Локальный git</th><td class="off">коммита всё ещё нет.</td></tr>
+                <tr><th>GitHub</th><td class="off">пусто.</td></tr>
+                <tr><th>Как выглядит</th><td>повторный <code>git status</code> показывает файл зелёным: <code>new file: index.php</code>.</td></tr>
+            </table>
+            <p class="note"><code>git add .</code> кладёт в индекс всё, что не закрыто <code>.gitignore</code>. Точка — «текущая папка». Папку <code>.grok/</code> так лучше не захватывать: это настройки редактора, не сайт.</p>
+        </li>
+
+        <li class="step">
+            <div class="step-head"><strong>Записать снимок в локальную историю</strong><span class="n">шаг 2</span></div>
+            <pre><code>git commit -m "Add test index.php"</code></pre>
+            <table>
+                <tr><th>Ключи</th><td><code class="flag">-m</code> — сообщение коммита сразу в команде. Текст в кавычках обязателен: без него git откроет редактор.</td></tr>
+                <tr><th>Что делает</th><td>Берёт индекс и сохраняет коммит в <code>.git</code>. Это уже история, но только на этом Mac.</td></tr>
+                <tr><th>Диск</th><td>файл на месте.</td></tr>
+                <tr><th>Индекс</th><td>черновик стал коммитом, новых правок в индексе нет.</td></tr>
+                <tr><th>Локальный git</th><td class="yes">коммит <code>c2ed292</code>, ветка <code>main</code>. Сообщение: Add test index.php. В коммите 1 файл, 21 строка.</td></tr>
+                <tr><th>GitHub</th><td class="off">пока пусто. Коммит локальный.</td></tr>
+                <tr><th>Автор</th><td>Имя и почта git взял с компьютера: <code>ivanromanov@Ivans-MacBook-Air.local</code>. Это предупреждение, коммит из-за него не отменяется.</td></tr>
+            </table>
+        </li>
+
+        <li class="step">
+            <div class="step-head"><strong>Подписать следующие коммиты аккаунтом GitHub</strong><span class="n">шаг 3, один раз</span></div>
+            <pre><code>git config --global user.name "Иван Романов"
+git config --global user.email "30245303+itwawox@users.noreply.github.com"</code></pre>
+            <table>
+                <tr><th>Ключи</th><td><code class="flag">--global</code> — записать настройку для всего Mac, не только для этой папки.</td></tr>
+                <tr><th>Что делает</th><td>Меняет имя автора для будущих коммитов. Файл <code>index.php</code> и коммит <code>c2ed292</code> не трогает.</td></tr>
+                <tr><th>Диск / индекс / GitHub</th><td>без изменений.</td></tr>
+                <tr><th>Почта</th><td><code>30245303+itwawox@users.noreply.github.com</code> — служебный адрес GitHub для аккаунта itwawox. Письма на него не приходят, в профиле он не светится, зато коммит привязывается к аккаунту.</td></tr>
+            </table>
+            <p class="note">Уже сделанный коммит можно переподписать, только если он ещё не ушёл на GitHub: <code>git commit --amend --reset-author</code>. <code class="flag">--amend</code> переписывает последний коммит. <code class="flag">--reset-author</code> ставит в него имя и почту из настройки выше. После <code>git push</code> этот коммит уже не переписывают.</p>
+        </li>
+
+        <li class="step">
+            <div class="step-head"><strong>Отправить историю на GitHub</strong><span class="n">шаг 4</span></div>
+            <pre><code>git push -u origin main</code></pre>
+            <table>
+                <tr><th>Ключи</th><td><code class="flag">-u</code> — запомнить связь локальной <code>main</code> с <code>origin/main</code>. Пишется один раз. Дальше достаточно <code>git push</code>.</td></tr>
+                <tr><th><code>origin</code></th><td>имя удалённого репозитория. Указывает на <code>https://github.com/itwawox/voidweb.git</code>.</td></tr>
+                <tr><th><code>main</code></th><td>ветка, которую отправляем.</td></tr>
+                <tr><th>Что делает</th><td>Копирует локальные коммиты на GitHub. Логин уже есть: аккаунт <code>itwawox</code>, протокол HTTPS, пароль спрашивать не должен.</td></tr>
+                <tr><th>Диск и индекс</th><td>без изменений.</td></tr>
+                <tr><th>Локальный git</th><td>тот же коммит <code>c2ed292</code>.</td></tr>
+                <tr><th>GitHub</th><td class="yes">появляется ветка <code>main</code> и файл <code>index.php</code>.</td></tr>
+            </table>
+        </li>
+
+        <li class="step">
+            <div class="step-head"><strong>Проверить, что история на месте</strong><span class="n">после отправки</span></div>
+            <pre><code>git status
+git log --oneline</code></pre>
+            <table>
+                <tr><th>Ключи</th><td><code class="flag">--oneline</code> — одна строка на коммит: короткий хеш и сообщение.</td></tr>
+                <tr><th>Чистый статус</th><td><code>nothing to commit, working tree clean</code> — на диске нет новых правок сверх последнего коммита.</td></tr>
+                <tr><th>Связь с GitHub</th><td><code>Your branch is up to date with 'origin/main'</code> — локальная ветка и GitHub совпадают.</td></tr>
+            </table>
+        </li>
+    </ol>
+
+    <h2>Если файл изменили ещё раз</h2>
+    <p>Правка в редакторе снова делает файл «грязным» только на диске. Старый коммит на GitHub остаётся прежним, пока не повторишь три команды:</p>
+    <pre><code>git add index.php
+git commit -m "Коротко, зачем правка"
+git push</code></pre>
+    <p>Ключ <code>-u</code> во второй раз не нужен: связь с <code>origin/main</code> уже записана.</p>
+
+    <h2>Что в эти команды не попадает</h2>
+    <table>
+        <tr><th><code>.env</code>, пароли, ключи</th><td>закрывает <code>.gitignore</code>. В этом репозитории там же закрыты <code>.grok/</code>, <code>vendor/</code> и <code>node_modules/</code>.</td></tr>
+        <tr><th><code>.grok/</code></th><td>настройки редактора. В статус попадает как неотслеживаемая папка. В <code>git add</code> её не включают.</td></tr>
+        <tr><th>Картинка-логотип сайта</th><td>коммитится так же, как <code>index.php</code>, если это часть проекта.</td></tr>
+        <tr><th>Файл, который пользователь загрузил на сайт</th><td>данные приложения, не исходный код. В учебный коммит его не кладут.</td></tr>
+    </table>
+</main>
+</body>
+</html>
